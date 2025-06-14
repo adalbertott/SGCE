@@ -134,10 +134,6 @@ def login():
         return jsonify({'success': False, 'message': 'Credenciais inválidas'}), 401
     
     return render_template('login.html')
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
@@ -370,7 +366,8 @@ def init_db():
             db.session.add(admin_user)
             db.session.commit()
 
+# Add this before app.run
 if __name__ == '__main__':
-    init_db()
-    port = int(os.environ.get("PORT", 5000))
+    with app.app_context():
+        db.create_all()
     app.run(host="0.0.0.0", port=port, debug=True)
