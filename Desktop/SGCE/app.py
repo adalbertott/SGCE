@@ -91,19 +91,16 @@ class Contato(db.Model):
     observacoes = db.Column(db.Text)
     responsavel = db.Column(db.String(100))
 
-# Rotas principais
 @app.route('/')
-def dashboard():
-    # Defina valores padrão para a sessão
+def main_dashboard():  # Mude o nome da função
     session['username'] = "Administrador"
     session['role'] = "admin"
     session['regiao'] = "Todas"
     return render_template('dashboard.html')
 
 @app.route('/login')
-def login():
-    # Redireciona direto para o dashboard
-    return redirect(url_for('dashboard'))
+def login_page():  # Mude o nome da função
+    return redirect(url_for('main_dashboard'))  # Referencie a nova função
 
 @app.route('/filiados')
 def filiados():
