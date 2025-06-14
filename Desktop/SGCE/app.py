@@ -100,30 +100,6 @@ class Contato(db.Model):
     observacoes = db.Column(db.Text)
     responsavel = db.Column(db.String(100))
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        try:
-            username = request.form['username']
-            password = request.form['password']
-            user = User.query.filter_by(username=username).first()
-            
-            if user and check_password_hash(user.password, password):
-                session['user_id'] = user.id
-                session['username'] = user.username
-                session['role'] = user.role
-                session['regiao'] = user.regiao
-                user.last_login = datetime.utcnow()
-                db.session.commit()
-                return jsonify({'success': True})
-            
-            return jsonify({'success': False, 'message': 'Credenciais inválidas'}), 401
-        
-        except Exception as e:
-            app.logger.error(f"Erro no login: {str(e)}")
-            return jsonify({'success': False, 'message': 'Erro interno no servidor'}), 500
-    
-    return render_template('login.html')
 
 @app.route('/logout')
 def logout():
@@ -131,16 +107,25 @@ def logout():
     return redirect(url_for('login'))
 
 # Middleware de autenticação
-@app.before_request
-def require_login():
-    allowed_routes = ['login', 'static']
-    if request.endpoint not in allowed_routes and 'user_id' not in session:
-        return redirect(url_for('login'))
+#@app.before_request
+#def require_login():
+ #   allowed_routes = ['login', 'static']
+  #  if request.endpoint not in allowed_routes and 'user_id' not in session:
+   #     return redirect(url_for('login'))
 
 # Rotas principais
 @app.route('/')
 def dashboard():
+    # Defina valores padrão para a sessão
+    session['username'] = "Administrador"
+    session['role'] = "admin"
+    session['regiao'] = "Todas"
     return render_template('dashboard.html')
+
+# Remova a rota de login ou redirecione para o dashboard
+@app.route('/login')
+def login():
+    return redirect(url_for('dashboard'))
 
 @app.route('/filiados')
 def filiados():
