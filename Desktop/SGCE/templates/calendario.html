@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário Estratégico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos base (reaproveitados) */
+        :root { /* ... */ }
+        * { /* ... */ }
+        body { /* ... */ }
+        .container { /* ... */ }
+        header { /* ... */ }
+        .nav-modulos { /* ... */ }
+        .modulo { /* ... */ }
+        .modulo-header { /* ... */ }
+        
+        /* Estilos específicos para calendário */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-navigation button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .calendar-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            padding: 10px;
+            background: var(--dark);
+            color: white;
+            font-weight: 500;
+            border-radius: 4px;
+        }
+        
+        .calendar-day {
+            height: 100px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 8px;
+            position: relative;
+            background: white;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background: #f8f9fa;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .event-item {
+            background: rgba(52, 152, 219, 0.1);
+            border-left: 3px solid var(--primary);
+            padding: 3px 6px;
+            margin: 3px 0;
+            border-radius: 2px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .event-item.important {
+            background: rgba(231, 76, 60, 0.1);
+            border-left-color: var(--danger);
+        }
+        
+        .events-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .events-container h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .event-card {
+            padding: 12px;
+            border-left: 4px solid var(--primary);
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .event-card:hover {
+            background: #e9f7fe;
+            transform: translateX(3px);
+        }
+        
+        .event-card.important {
+            border-left-color: var(--danger);
+        }
+        
+        .event-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .event-details {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .other-month {
+            background: #f9f9f9;
+            color: #bbb;
+        }
+        
+        .today {
+            background: #e9f7fe;
+            border: 2px solid var(--primary);
+        }
+        
+        .add-event-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .add-event-button:hover {
+            background: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Calendário Estratégico</h1>
+            <p>Planejamento de eventos e atividades</p>
+        </header>
+        
+        <div class="nav-modulos">
+            <button>Dashboard</button>
+            <button>Filiados</button>
+            <button>Comunicação</button>
+            <button class="active">Calendário</button>
+            <button>Inteligência Territorial</button>
+            <button>Eventos</button>
+            <button>Metas</button>
+            <button>Admin</button>
+        </div>
+        
+        <div class="modulo">
+            <div class="modulo-header">
+                <h2>Calendário Estratégico 2023-2027</h2>
+                <button class="add-event-button">
+                    <i class="fas fa-plus"></i> Novo Evento
+                </button>
+            </div>
+            
+            <div class="calendar-header">
+                <div class="calendar-navigation">
+                    <button><i class="fas fa-chevron-left"></i></button>
+                </div>
+                <h2 class="calendar-title">Junho 2024</h2>
+                <div class="calendar-navigation">
+                    <button><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            
+            <div class="calendar-grid">
+                <div class="calendar-day-header">Dom</div>
+                <div class="calendar-day-header">Seg</div>
+                <div class="calendar-day-header">Ter</div>
+                <div class="calendar-day-header">Qua</div>
+                <div class="calendar-day-header">Qui</div>
+                <div class="calendar-day-header">Sex</div>
+                <div class="calendar-day-header">Sáb</div>
+                
+                <!-- Dias do mês -->
+                <div class="calendar-day other-month">
+                    <div class="day-number">28</div>
+                </div>
+                <div class="calendar-day other-month">
+                    <div class="day-number">29</div>
+                </div>
+                <div class="calendar-day other-month">
+                    <div class="day-number">30</div>
+                </div>
+                <div class="calendar-day other-month">
+                    <div class="day-number">31</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">1</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">2</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">3</div>
+                    <div class="event-item">Reunião Regional Norte</div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="day-number">4</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">5</div>
+                    <div class="event-item">Visita Escola Básica Centro</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">6</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">7</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">8</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">9</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">10</div>
+                    <div class="event-item important">Assembleia Geral</div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="day-number">11</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">12</div>
+                    <div class="event-item">Encontro com Apoiadores</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">13</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">14</div>
+                </div>
+                <div class="calendar-day today">
+                    <div class="day-number">15</div>
+                    <div class="event-item important">Eleições Sindicato</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">16</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">17</div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="day-number">18</div>
+                    <div class="event-item">Reunião de Planejamento</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">19</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">20</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">21</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">22</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">23</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">24</div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="day-number">25</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">26</div>
+                    <div class="event-item">Visita Escola Básica Sul</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">27</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">28</div>
+                    <div class="event-item important">Congresso Estadual</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">29</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">30</div>
+                </div>
+                <div class="calendar-day other-month">
+                    <div class="day-number">1</div>
+                </div>
+            </div>
+            
+            <div class="events-container">
+                <h3>Próximos Eventos</h3>
+                
+                <div class="event-card important">
+                    <div class="event-title">Eleições Sindicato</div>
+                    <div class="event-details">
+                        <span><i class="fas fa-calendar"></i> 15 Junho 2024</span>
+                        <span><i class="fas fa-clock"></i> 14:00 - 18:00</span>
+                        <span><i class="fas fa-map-marker-alt"></i> Sede do Sindicato</span>
+                    </div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-title">Visita Escola Básica Sul</div>
+                    <div class="event-details">
+                        <span><i class="fas fa-calendar"></i> 26 Junho 2024</span>
+                        <span><i class="fas fa-clock"></i> 10:00 - 12:00</span>
+                        <span><i class="fas fa-map-marker-alt"></i> EBM Campeche</span>
+                    </div>
+                </div>
+                
+                <div class="event-card important">
+                    <div class="event-title">Congresso Estadual</div>
+                    <div class="event-details">
+                        <span><i class="fas fa-calendar"></i> 28-30 Junho 2024</span>
+                        <span><i class="fas fa-clock"></i> Todo o dia</span>
+                        <span><i class="fas fa-map-marker-alt"></i> Centro de Convenções</span>
+                    </div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-title">Reunião de Planejamento</div>
+                    <div class="event-details">
+                        <span><i class="fas fa-calendar"></i> 18 Junho 2024</span>
+                        <span><i class="fas fa-clock"></i> 16:00 - 18:00</span>
+                        <span><i class="fas fa-map-marker-alt"></i> Sede do Sindicato</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

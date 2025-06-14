@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunicação Estratégica</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos base (reaproveitados) */
+        :root { /* ... */ }
+        * { /* ... */ }
+        body { /* ... */ }
+        .container { /* ... */ }
+        header { /* ... */ }
+        .nav-modulos { /* ... */ }
+        .modulo { /* ... */ }
+        .modulo-header { /* ... */ }
+        
+        /* Estilos específicos para comunicação */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .campaign-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+            transition: all 0.2s ease;
+        }
+        
+        .campaign-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        
+        .campaign-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .campaign-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .campaign-status {
+            font-size: 0.85rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        
+        .status-scheduled {
+            background: rgba(243, 156, 18, 0.1);
+            color: #e67e22;
+        }
+        
+        .status-sent {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+        
+        .campaign-details {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .campaign-content {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 2px solid #ddd;
+        }
+        
+        .campaign-stats {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .template-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+        
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .template-title {
+            font-weight: 600;
+        }
+        
+        .template-tags {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .template-tag {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--primary);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .template-content {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            max-height: 100px;
+            overflow: hidden;
+        }
+        
+        .new-message-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .new-message-button:hover {
+            background: #27ae60;
+        }
+        
+        .message-form {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            min-height: 150px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-secondary {
+            background: #eee;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Comunicação Estratégica</h1>
+            <p>Disparo de mensagens e gestão de comunicação</p>
+        </header>
+        
+        <div class="nav-modulos">
+            <button>Dashboard</button>
+            <button>Filiados</button>
+            <button class="active">Comunicação</button>
+            <button>Calendário</button>
+            <button>Inteligência Territorial</button>
+            <button>Eventos</button>
+            <button>Metas</button>
+            <button>Admin</button>
+        </div>
+        
+        <div class="modulo">
+            <div class="modulo-header">
+                <h2>Comunicação Estratégica</h2>
+                <button class="new-message-button">
+                    <i class="fas fa-plus"></i> Nova Mensagem
+                </button>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" data-tab="campanhas">Campanhas</button>
+                <button class="tab" data-tab="templates">Templates</button>
+                <button class="tab" data-tab="relatorios">Relatórios</button>
+            </div>
+            
+            <div id="campanhas" class="tab-content active">
+                <div class="campaign-card">
+                    <div class="campaign-header">
+                        <div class="campaign-title">Convite Assembleia Geral</div>
+                        <div class="campaign-status status-sent">Enviada</div>
+                    </div>
+                    <div class="campaign-details">
+                        <span><i class="fas fa-calendar"></i> 05/06/2024</span>
+                        <span><i class="fas fa-users"></i> Todos os filiados</span>
+                        <span><i class="fas fa-paper-plane"></i> WhatsApp</span>
+                    </div>
+                    <div class="campaign-content">
+                        Prezado(a) filiado(a), convidamos para nossa Assembleia Geral no dia 10/06 às 19h na sede do sindicato. Sua presença é fundamental!
+                    </div>
+                    <div class="campaign-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">1,248</div>
+                            <div class="stat-label">Enviadas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">842</div>
+                            <div class="stat-label">Entregues</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">215</div>
+                            <div class="stat-label">Respostas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">67%</div>
+                            <div class="stat-label">Taxa de abertura</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="campaign-card">
+                    <div class="campaign-header">
+                        <div class="campaign-title">Lembrete Eleições</div>
+                        <div class="campaign-status status-scheduled">Agendada</div>
+                    </div>
+                    <div class="campaign-details">
+                        <span><i class="fas fa-calendar"></i> 14/06/2024 10:00</span>
+                        <span><i class="fas fa-users"></i> Apoiadores</span>
+                        <span><i class="fas fa-paper-plane"></i> WhatsApp</span>
+                    </div>
+                    <div class="campaign-content">
+                        Amigo(a) apoiador, não esqueça: eleições do sindicato dia 15/06 das 14h às 18h. Contamos com seu voto e apoio!
+                    </div>
+                    <div class="campaign-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">742</div>
+                            <div class="stat-label">Agendadas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Entregues</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Respostas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Taxa de abertura</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="campaign-card">
+                    <div class="campaign-header">
+                        <div class="campaign-title">Resultado Eleições</div>
+                        <div class="campaign-status status-scheduled">Rascunho</div>
+                    </div>
+                    <div class="campaign-details">
+                        <span><i class="fas fa-calendar"></i> 16/06/2024 09:00</span>
+                        <span><i class="fas fa-users"></i> Todos os filiados</span>
+                        <span><i class="fas fa-paper-plane"></i> WhatsApp</span>
+                    </div>
+                    <div class="campaign-content">
+                        Prezados filiados, agradecemos a participação nas eleições. Os resultados serão divulgados em breve. Acompanhe nossas redes sociais!
+                    </div>
+                    <div class="campaign-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Agendadas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Entregues</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Respostas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Taxa de abertura</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="templates" class="tab-content">
+                <div class="template-grid">
+                    <div class="template-card">
+                        <div class="template-header">
+                            <div class="template-title">Convite Assembleia</div>
+                            <div>
+                                <button class="btn-action btn-edit btn-sm"><i class="fas fa-edit"></i></button>
+                                <button class="btn-action btn-delete btn-sm"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="template-tags">
+                            <span class="template-tag">Assembleia</span>
+                            <span class="template-tag">Convite</span>
+                        </div>
+                        <div class="template-content">
+                            Prezado(a) {nome}, convidamos para nossa assembleia no dia {data} às {hora} no {local}. Sua presença é fundamental para discutirmos...
+                        </div>
+                    </div>
+                    
+                    <div class="template-card">
+                        <div class="template-header">
+                            <div class="template-title">Lembrete Eleição</div>
+                            <div>
+                                <button class="btn-action btn-edit btn-sm"><i class="fas fa-edit"></i></button>
+                                <button class="btn-action btn-delete btn-sm"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="template-tags">
+                            <span class="template-tag">Eleição</span>
+                            <span class="template-tag">Lembrete</span>
+                        </div>
+                        <div class="template-content">
+                            Olá {nome}, não esqueça: eleições do sindicato amanhã ({data}) das {hora_inicio} às {hora_fim} no {local}. Contamos com seu voto!
+                        </div>
+                    </div>
+                    
+                    <div class="template-card">
+                        <div class="template-header">
+                            <div class="template-title">Agradecimento</div>
+                            <div>
+                                <button class="btn-action btn-edit btn-sm"><i class="fas fa-edit"></i></button>
+                                <button class="btn-action btn-delete btn-sm"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="template-tags">
+                            <span class="template-tag">Geral</span>
+                            <span class="template-tag">Agradecimento</span>
+                        </div>
+                        <div class="template-content">
+                            Prezado(a) {nome}, agradecemos sua participação no {evento}. Seu apoio é fundamental para nosso sindicato. Juntos somos mais fortes!
+                        </div>
+                    </div>
+                    
+                    <div class="template-card">
+                        <div class="template-header">
+                            <div class="template-title">Pesquisa Satisfação</div>
+                            <div>
+                                <button class="btn-action btn-edit btn-sm"><i class="fas fa-edit"></i></button>
+                                <button class="btn-action btn-delete btn-sm"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="template-tags">
+                            <span class="template-tag">Pesquisa</span>
+                            <span class="template-tag">Feedback</span>
+                        </div>
+                        <div class="template-content">
+                            Olá {nome}, gostaríamos de ouvir sua opinião. Responda nossa rápida pesquisa: {link_pesquisa}. Sua contribuição é muito importante!
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="relatorios" class="tab-content">
+                <div class="campaign-card">
+                    <h3>Relatório de Engajamento</h3>
+                    <p>Taxa de abertura e resposta das mensagens enviadas no último mês</p>
+                    <button class="btn-primary">Gerar Relatório</button>
+                </div>
+                
+                <div class="campaign-card">
+                    <h3>Histórico de Comunicação</h3>
+                    <p>Todas as mensagens enviadas por período</p>
+                    <button class="btn-primary">Gerar Relatório</button>
+                </div>
+                
+                <div class="campaign-card">
+                    <h3>Eficácia por Segmento</h3>
+                    <p>Comparativo de engajamento entre diferentes grupos de filiados</p>
+                    <button class="btn-primary">Gerar Relatório</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

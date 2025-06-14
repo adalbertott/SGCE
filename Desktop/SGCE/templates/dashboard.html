@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Campanha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>Sistema de Campanha Sindical</h1>
+                <div class="user-info">
+                    <span>{{ session.username }}</span>
+                    <span>({{ session.role|capitalize }} - {{ session.regiao }})</span>
+                    <a href="/logout" class="btn-logout">Sair</a>
+                </div>
+            </div>
+            <p>Gestão estratégica 2023-2027</p>
+        </header>
+        
+        <nav class="nav-modulos">
+            <button class="active" data-modulo="dashboard">Dashboard</button>
+            <button data-modulo="filiados">Filiados</button>
+            <button data-modulo="comunicacao">Comunicação</button>
+            <button data-modulo="calendario">Calendário</button>
+            <button data-modulo="territorial">Inteligência Territorial</button>
+            <button data-modulo="eventos">Eventos</button>
+            <button data-modulo="metas">Metas</button>
+            {% if session.role == 'admin' %}
+            <button data-modulo="admin">Admin</button>
+            {% endif %}
+        </nav>
+        
+        <!-- Módulo Dashboard -->
+        <section id="modulo-dashboard" class="modulo active">
+            <div class="modulo-header">
+                <h2>Visão Geral da Campanha</h2>
+                <div class="filters">
+                    <select id="kpi-period">
+                        <option value="today">Hoje</option>
+                        <option value="week">Esta Semana</option>
+                        <option value="month" selected>Este Mês</option>
+                        <option value="quarter">Este Trimestre</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h2>Filiados</h2>
+                        <div class="value" id="kpi-total-filiados">0</div>
+                        <div class="stat-change" id="kpi-filiados-change">+0%</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h2>Apoiadores</h2>
+                        <div class="value" id="kpi-total-apoiadores">0</div>
+                        <div class="stat-change" id="kpi-apoiadores-change">+0%</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h2>Taxa de Apoio</h2>
+                        <div class="value" id="kpi-taxa-apoio">0%</div>
+                        <div class="stat-change" id="kpi-taxa-change">+0%</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h2>Eventos</h2>
+                        <div class="value" id="kpi-eventos">0</div>
+                        <div class="stat-change" id="kpi-eventos-change">+0%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h2>Evolução de Apoiadores</h2>
+                    <canvas id="evolucao-chart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h2>Próximos Eventos</h2>
+                    <div id="proximos-eventos" class="eventos-list">
+                        <!-- Eventos serão carregados via JS -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-container">
+                <div class="action-card">
+                    <h3>Ações Rápidas</h3>
+                    <button class="btn-action">
+                        <i class="fas fa-plus"></i> Novo Filiado
+                    </button>
+                    <button class="btn-action">
+                        <i class="fas fa-bullhorn"></i> Agendar Mensagem
+                    </button>
+                    <button class="btn-action">
+                        <i class="fas fa-calendar-plus"></i> Criar Evento
+                    </button>
+                </div>
+                
+                <div class="action-card">
+                    <h3>Metas em Destaque</h3>
+                    <div id="metas-destaque">
+                        <!-- Metas serão carregadas via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Outros módulos serão carregados dinamicamente -->
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/scripts.js"></script>
+    <script>
+        // Carregar dados do dashboard
+        function loadDashboardData() {
+            $.get('/api/kpi', function(data) {
+                // Atualizar KPIs
+                $('#kpi-total-filiados').text(data.filiados.total);
+                $('#kpi-total-apoiadores').text(data.filiados.apoiadores);
+                
+                const taxaApoio = data.filiados.apoiadores / data.filiados.total * 100;
+                $('#kpi-taxa-apoio').text(taxaApoio.toFixed(1) + '%');
+                
+                $('#kpi-eventos').text(data.eventos_proximos);
+                
+                // Atualizar eventos próximos
+                $.get('/api/eventos', function(eventos) {
+                    let eventosHtml = '';
+                    eventos.slice(0, 5).forEach(evento => {
+                        const date = new Date(evento.data_inicio);
+                        eventosHtml += `
+                        <div class="evento-item">
+                            <div class="evento-date">
+                                ${date.getDate()}/${date.getMonth()+1}
+                            </div>
+                            <div class="evento-info">
+                                <strong>${evento.titulo}</strong>
+                                <div>${evento.local}</div>
+                            </div>
+                        </div>`;
+                    });
+                    $('#proximos-eventos').html(eventosHtml);
+                });
+            });
+        }
+        
+        // Inicialização
+        $(document).ready(function() {
+            loadDashboardData();
+            
+            // Controle de módulos
+            $('.nav-modulos button').click(function() {
+                $('.nav-modulos button').removeClass('active');
+                $(this).addClass('active');
+                
+                const moduloId = $(this).data('modulo');
+                $('.modulo').removeClass('active');
+                $(`#modulo-${moduloId}`).addClass('active');
+                
+                // Carregar dados específicos do módulo se necessário
+                if (moduloId === 'filiados') {
+                    loadFiliados();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

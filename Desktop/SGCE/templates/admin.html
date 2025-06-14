@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração do Sistema</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos base (reaproveitados) */
+        :root { /* ... */ }
+        * { /* ... */ }
+        body { /* ... */ }
+        .container { /* ... */ }
+        header { /* ... */ }
+        .nav-modulos { /* ... */ }
+        .modulo { /* ... */ }
+        .modulo-header { /* ... */ }
+        .tabs { /* ... */ }
+        .tab { /* ... */ }
+        .tab-content { /* ... */ }
+        .table-container { /* ... */ }
+        table { /* ... */ }
+        th { /* ... */ }
+        td { /* ... */ }
+        .action-buttons { /* ... */ }
+        .btn-action { /* ... */ }
+        
+        /* Estilos específicos para admin */
+        .admin-section {
+            margin-bottom: 30px;
+        }
+        
+        .admin-section h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .btn-save {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .system-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .backup-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        .backup-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .btn-backup {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            flex: 1;
+        }
+        
+        .btn-restore {
+            background: var(--warning);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Administração do Sistema</h1>
+            <p>Configurações e gerenciamento avançado</p>
+        </header>
+        
+        <div class="nav-modulos">
+            <button>Dashboard</button>
+            <button>Filiados</button>
+            <button>Comunicação</button>
+            <button>Calendário</button>
+            <button>Inteligência Territorial</button>
+            <button>Eventos</button>
+            <button>Metas</button>
+            <button class="active">Admin</button>
+        </div>
+        
+        <div class="modulo">
+            <div class="modulo-header">
+                <h2>Painel de Administração</h2>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" data-tab="usuarios">Usuários</button>
+                <button class="tab" data-tab="config">Configurações</button>
+                <button class="tab" data-tab="backup">Backup</button>
+                <button class="tab" data-tab="estatisticas">Estatísticas</button>
+            </div>
+            
+            <div id="usuarios" class="tab-content active">
+                <div class="admin-section">
+                    <h3>Novo Usuário</h3>
+                    <form class="user-form">
+                        <div class="form-group">
+                            <label for="username">Nome de Usuário *</label>
+                            <input type="text" id="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Senha *</label>
+                            <input type="password" id="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password">Confirmar Senha *</label>
+                            <input type="password" id="confirm-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="role">Perfil *</label>
+                            <select id="role" required>
+                                <option value="">Selecione...</option>
+                                <option value="admin">Administrador</option>
+                                <option value="coordinator">Coordenador Regional</option>
+                                <option value="mobilizer">Mobilizador</option>
+                                <option value="viewer">Visualizador</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="region">Região</label>
+                            <select id="region">
+                                <option value="">Todas</option>
+                                <option value="centro">Centro</option>
+                                <option value="norte">Norte</option>
+                                <option value="sul">Sul</option>
+                                <option value="leste">Leste</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <button type="submit" class="btn-save">
+                                <i class="fas fa-save"></i> Salvar Usuário
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="admin-section">
+                    <h3>Usuários Cadastrados</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Usuário</th>
+                                    <th>Email</th>
+                                    <th>Perfil</th>
+                                    <th>Região</th>
+                                    <th>Último Acesso</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>admin</td>
+                                    <td>admin@sindicato.org</td>
+                                    <td>Administrador</td>
+                                    <td>Todas</td>
+                                    <td>14/06/2024 15:30</td>
+                                    <td><span class="status-badge active">Ativo</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-edit btn-sm"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-action btn-delete btn-sm"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>maria_coord</td>
+                                    <td>maria@sindicato.org</td>
+                                    <td>Coordenador Regional</td>
+                                    <td>Norte</td>
+                                    <td>14/06/2024 14:22</td>
+                                    <td><span class="status-badge active">Ativo</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-edit btn-sm"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-action btn-delete btn-sm"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>carlos_mob</td>
+                                    <td>carlos@sindicato.org</td>
+                                    <td>Mobilizador</td>
+                                    <td>Sul</td>
+                                    <td>13/06/2024 11:45</td>
+                                    <td><span class="status-badge active">Ativo</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-edit btn-sm"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-action btn-delete btn-sm"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ana_view</td>
+                                    <td>ana@sindicato.org</td>
+                                    <td>Visualizador</td>
+                                    <td>Centro</td>
+                                    <td>12/06/2024 09:15</td>
+                                    <td><span class="status-badge inactive">Inativo</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-edit btn-sm"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-action btn-delete btn-sm"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="config" class="tab-content">
+                <div class="admin-section">
+                    <h3>Configurações Gerais</h3>
+                    <form class="user-form">
+                        <div class="form-group">
+                            <label for="system-name">Nome do Sistema</label>
+                            <input type="text" id="system-name" value="Sistema de Campanha Sindical">
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-email">Email do Administrador</label>
+                            <input type="email" id="admin-email" value="admin@sindicato.org">
+                        </div>
+                        <div class="form-group">
+                            <label for="whatsapp-number">WhatsApp para Contato</label>
+                            <input type="text" id="whatsapp-number" value="+5548999999999">
+                        </div>
+                        <div class="form-group">
+                            <label for="timezone">Fuso Horário</label>
+                            <select id="timezone">
+                                <option>America/Sao_Paulo</option>
+                                <!-- Outras opções de fuso horário -->
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <button type="submit" class="btn-save">
+                                <i class="fas fa-save"></i> Salvar Configurações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div id="backup" class="tab-content">
+                <div class="admin-section">
+                    <h3>Backup e Restauração</h3>
+                    <div class="backup-section">
+                        <p><strong>Último backup:</strong> 14/06/2024 03:00</p>
+                        <p><strong>Próximo backup automático:</strong> 15/06/2024 03:00</p>
+                        
+                        <div class="backup-actions">
+                            <button class="btn-backup">
+                                <i class="fas fa-download"></i> Realizar Backup Agora
+                            </button>
+                            <button class="btn-restore">
+                                <i class="fas fa-upload"></i> Restaurar Backup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="estatisticas" class="tab-content">
+                <div class="admin-section">
+                    <h3>Estatísticas do Sistema</h3>
+                    <div class="system-stats">
+                        <div class="stat-card">
+                            <div class="stat-value">1,248</div>
+                            <div class="stat-label">Filiados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">742</div>
+                            <div class="stat-label">Apoiadores</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">42</div>
+                            <div class="stat-label">Eventos Realizados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">1.2 GB</div>
+                            <div class="stat-label">Armazenamento</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Usuários Ativos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">97%</div>
+                            <div class="stat-label">Disponibilidade</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

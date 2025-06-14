@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Eventos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos base (reaproveitados) */
+        :root { /* ... */ }
+        * { /* ... */ }
+        body { /* ... */ }
+        .container { /* ... */ }
+        header { /* ... */ }
+        .nav-modulos { /* ... */ }
+        .modulo { /* ... */ }
+        .modulo-header { /* ... */ }
+        .tabs { /* ... */ }
+        .tab { /* ... */ }
+        .tab-content { /* ... */ }
+        
+        /* Estilos específicos para eventos */
+        .event-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .event-filters select {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .event-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .event-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        
+        .event-card.important {
+            border-left-color: var(--danger);
+        }
+        
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .event-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .event-date {
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .event-details {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .event-participants {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .participant-count {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .participant-count span {
+            font-weight: 600;
+        }
+        
+        .event-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-details {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--primary);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-participants {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--secondary);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .new-event-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .new-event-button:hover {
+            background: #27ae60;
+        }
+        
+        .event-type-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-right: 8px;
+        }
+        
+        .badge-assembly {
+            background: rgba(243, 156, 18, 0.1);
+            color: #e67e22;
+        }
+        
+        .badge-election {
+            background: rgba(231, 76, 60, 0.1);
+            color: #c0392b;
+        }
+        
+        .badge-meeting {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gestão de Eventos</h1>
+            <p>Organização e acompanhamento de eventos</p>
+        </header>
+        
+        <div class="nav-modulos">
+            <button>Dashboard</button>
+            <button>Filiados</button>
+            <button>Comunicação</button>
+            <button>Calendário</button>
+            <button>Inteligência Territorial</button>
+            <button class="active">Eventos</button>
+            <button>Metas</button>
+            <button>Admin</button>
+        </div>
+        
+        <div class="modulo">
+            <div class="modulo-header">
+                <h2>Eventos e Atividades</h2>
+                <button class="new-event-button">
+                    <i class="fas fa-plus"></i> Novo Evento
+                </button>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" data-tab="proximos">Próximos</button>
+                <button class="tab" data-tab="passados">Passados</button>
+                <button class="tab" data-tab="todos">Todos</button>
+            </div>
+            
+            <div class="event-filters">
+                <select>
+                    <option>Todos os tipos</option>
+                    <option>Assembleia</option>
+                    <option>Reunião</option>
+                    <option>Eleição</option>
+                    <option>Congresso</option>
+                </select>
+                <select>
+                    <option>Todas as regiões</option>
+                    <option>Centro</option>
+                    <option>Norte</option>
+                    <option>Sul</option>
+                    <option>Leste</option>
+                </select>
+                <select>
+                    <option>Ordenar por data</option>
+                    <option>Ordenar por prioridade</option>
+                </select>
+            </div>
+            
+            <div id="proximos" class="tab-content active">
+                <div class="event-list">
+                    <div class="event-card important">
+                        <div class="event-header">
+                            <div class="event-title">
+                                <span class="event-type-badge badge-election">Eleição</span>
+                                Eleições do Sindicato
+                            </div>
+                            <div class="event-date">15/06/2024</div>
+                        </div>
+                        <div class="event-details">
+                            <span><i class="fas fa-map-marker-alt"></i> Sede do Sindicato</span>
+                            <span><i class="fas fa-clock"></i> 14:00 - 18:00</span>
+                            <span><i class="fas fa-user"></i> Coordenação Geral</span>
+                        </div>
+                        <p>Eleições para nova diretoria do sindicato. Compareça e exerça seu direito de voto!</p>
+                        <div class="event-participants">
+                            <div class="participant-count">
+                                <i class="fas fa-user-check"></i>
+                                <span>215</span> confirmados
+                            </div>
+                            <div class="participant-count">
+                                <i class="fas fa-user-clock"></i>
+                                <span>58</span> pendentes
+                            </div>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn-details"><i class="fas fa-eye"></i> Ver Detalhes</button>
+                            <button class="btn-participants"><i class="fas fa-list"></i> Lista de Participantes</button>
+                        </div>
+                    </div>
+                    
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-title">
+                                <span class="event-type-badge badge-assembly">Assembleia</span>
+                                Assembleia Regional Norte
+                            </div>
+                            <div class="event-date">20/06/2024</div>
+                        </div>
+                        <div class="event-details">
+                            <span><i class="fas fa-map-marker-alt"></i> Escola Básica Canasvieiras</span>
+                            <span><i class="fas fa-clock"></i> 19:00 - 21:00</span>
+                            <span><i class="fas fa-user"></i> Coordenador Regional</span>
+                        </div>
+                        <p>Assembleia para discutir pautas específicas da região norte e planejar ações futuras.</p>
+                        <div class="event-participants">
+                            <div class="participant-count">
+                                <i class="fas fa-user-check"></i>
+                                <span>87</span> confirmados
+                            </div>
+                            <div class="participant-count">
+                                <i class="fas fa-user-clock"></i>
+                                <span>42</span> pendentes
+                            </div>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn-details"><i class="fas fa-eye"></i> Ver Detalhes</button>
+                            <button class="btn-participants"><i class="fas fa-list"></i> Lista de Participantes</button>
+                        </div>
+                    </div>
+                    
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-title">
+                                <span class="event-type-badge badge-meeting">Reunião</span>
+                                Reunião de Planejamento
+                            </div>
+                            <div class="event-date">25/06/2024</div>
+                        </div>
+                        <div class="event-details">
+                            <span><i class="fas fa-map-marker-alt"></i> Sede do Sindicato</span>
+                            <span><i class="fas fa-clock"></i> 16:00 - 18:00</span>
+                            <span><i class="fas fa-user"></i> Diretoria</span>
+                        </div>
+                        <p>Reunião para planejar as ações do próximo trimestre e avaliar resultados das eleições.</p>
+                        <div class="event-participants">
+                            <div class="participant-count">
+                                <i class="fas fa-user-check"></i>
+                                <span>15</span> confirmados
+                            </div>
+                            <div class="participant-count">
+                                <i class="fas fa-user-clock"></i>
+                                <span>3</span> pendentes
+                            </div>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn-details"><i class="fas fa-eye"></i> Ver Detalhes</button>
+                            <button class="btn-participants"><i class="fas fa-list"></i> Lista de Participantes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="passados" class="tab-content">
+                <div class="event-list">
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-title">
+                                <span class="event-type-badge badge-assembly">Assembleia</span>
+                                Assembleia Geral
+                            </div>
+                            <div class="event-date">10/06/2024</div>
+                        </div>
+                        <div class="event-details">
+                            <span><i class="fas fa-map-marker-alt"></i> Sede do Sindicato</span>
+                            <span><i class="fas fa-clock"></i> 19:00 - 22:00</span>
+                            <span><i class="fas fa-user"></i> Coordenação Geral</span>
+                        </div>
+                        <p>Assembleia geral para discutir pautas importantes antes das eleições.</p>
+                        <div class="event-participants">
+                            <div class="participant-count">
+                                <i class="fas fa-user-check"></i>
+                                <span>284</span> participantes
+                            </div>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn-details"><i class="fas fa-eye"></i> Ver Detalhes</button>
+                            <button class="btn-participants"><i class="fas fa-list"></i> Lista de Participantes</button>
+                        </div>
+                    </div>
+                    
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-title">
+                                <span class="event-type-badge badge-meeting">Reunião</span>
+                                Reunião com Apoiadores
+                            </div>
+                            <div class="event-date">05/06/2024</div>
+                        </div>
+                        <div class="event-details">
+                            <span><i class="fas fa-map-marker-alt"></i> Escola Básica Centro</span>
+                            <span><i class="fas fa-clock"></i> 18:00 - 20:00</span>
+                            <span><i class="fas fa-user"></i> Coordenadores</span>
+                        </div>
+                        <p>Reunião estratégica com apoiadores para alinhar ações pré-eleições.</p>
+                        <div class="event-participants">
+                            <div class="participant-count">
+                                <i class="fas fa-user-check"></i>
+                                <span>142</span> participantes
+                            </div>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn-details"><i class="fas fa-eye"></i> Ver Detalhes</button>
+                            <button class="btn-participants"><i class="fas fa-list"></i> Lista de Participantes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Campanha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body id="login-page">
+    <div class="login-container">
+        <h1><i class="fas fa-users"></i> Sistema de Campanha</h1>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Usuário</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="btn-login">Entrar</button>
+            
+            <div id="login-error" class="error-message" style="display: none;">
+                Credenciais inválidas. Tente novamente.
+            </div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <script>
+function realizarLogin() {
+    const username = $('#username').val();
+    const password = $('#password').val();
+    
+    $.post('/login', {
+        username: username,
+        password: password
+    }, function(response) {
+        if (response.success) {
+            window.location.href = '/';  // Redirect on success
+        } else {
+            $('#login-error').text(response.message).show();
+        }
+    }).fail(function() {
+        $('#login-error').text('Erro de conexão').show();
+    });
+}
+    </script>
+</body>
+</html>
