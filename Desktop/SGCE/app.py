@@ -100,30 +100,28 @@ class Contato(db.Model):
     observacoes = db.Column(db.Text)
     responsavel = db.Column(db.String(100))
 
-# DEIXE APENAS ESTA
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        user = User.query.filter_by(username=username).first()
+        try:
+            username = request.form['username']
+            password = request.form['password']
+            user = User.query.filter_by(username=username).first()
+            
+            if user and check_password_hash(user.password, password):
+                session['user_id'] = user.id
+                session['username'] = user.username
+                session['role'] = user.role
+                session['regiao'] = user.regiao
+                user.last_login = datetime.utcnow()
+                db.session.commit()
+                return jsonify({'success': True})
+            
+            return jsonify({'success': False, 'message': 'Credenciais inválidas'}), 401
         
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id
-            session['username'] = user.username
-            session['role'] = user.role
-            session['regiao'] = user.regiao
-            user.last_login = datetime.utcnow()
-            db.session.commit()
-            # Return JSON for AJAX
-            return jsonify({'success': True})
-        
-        # Return JSON error
-        return jsonify({'success': False, 'message': 'Credenciais inválidas'}), 401
+        except Exception as e:
+            app.logger.error(f"Erro no login: {str(e)}")
+            return jsonify({'success': False, 'message': 'Erro interno no servidor'}), 500
     
     return render_template('login.html')
 
@@ -344,7 +342,7 @@ def init_db():
         print("Usuário admin criado com sucesso!")  # Adicione esta linha
     else:
         print("Usuário admin já existe")  # Adicione esta linha
-        
+
 if __name__ == '__main__':
     init_db()  # Chama a função de inicialização corrigida
     port = int(os.environ.get('PORT', 5000))  # Adicione esta linha
