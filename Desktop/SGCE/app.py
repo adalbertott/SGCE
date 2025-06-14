@@ -122,10 +122,6 @@ def dashboard():
     session['regiao'] = "Todas"
     return render_template('dashboard.html')
 
-# Remova a rota de login ou redirecione para o dashboard
-@app.route('/login')
-def login():
-    return redirect(url_for('dashboard'))
 
 @app.route('/filiados')
 def filiados():
