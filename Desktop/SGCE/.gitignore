@@ -1,0 +1,18 @@
+# Ignorar banco de dados local
+instance/
+*.db
+
+# Ignorar arquivos do sistema
+*.lnk
+*.pdf
+*.xlsx
+*.docx
+*.jpeg
+*.jpg
+*.mp4
+*.pyc
+__pycache__/
+.DS_Store
+
+# Ignorar tudo fora do projeto
+../*
