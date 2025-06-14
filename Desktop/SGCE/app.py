@@ -16,7 +16,6 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 import numpy as np
-from werkzeug.security import generate_password_hash, check_password_hash
 import calendar
 from dateutil.relativedelta import relativedelta
 
@@ -28,15 +27,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Modelos de dados
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(50), default='regional')  # admin, regional
-    regiao = db.Column(db.String(50))
-    last_login = db.Column(db.DateTime)
-
+# Modelos de dados (mantidos para outras funcionalidades)
 class Filiado(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(150), nullable=False)
@@ -100,19 +91,6 @@ class Contato(db.Model):
     observacoes = db.Column(db.Text)
     responsavel = db.Column(db.String(100))
 
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
-
-# Middleware de autenticação
-#@app.before_request
-#def require_login():
- #   allowed_routes = ['login', 'static']
-  #  if request.endpoint not in allowed_routes and 'user_id' not in session:
-   #     return redirect(url_for('login'))
-
 # Rotas principais
 @app.route('/')
 def dashboard():
@@ -122,18 +100,18 @@ def dashboard():
     session['regiao'] = "Todas"
     return render_template('dashboard.html')
 
+@app.route('/login')
+def login():
+    # Redireciona direto para o dashboard
+    return redirect(url_for('dashboard'))
 
 @app.route('/filiados')
 def filiados():
-    regiao = session.get('regiao', 'Todas')
-    if regiao == 'Todas' or session.get('role') == 'admin':
-        total_filiados = Filiado.query.count()
-        total_apoiadores = Filiado.query.filter_by(apoiador=True).count()
-        filiados = Filiado.query.all()
-    else:
-        total_filiados = Filiado.query.filter_by(regiao=regiao).count()
-        total_apoiadores = Filiado.query.filter_by(regiao=regiao, apoiador=True).count()
-        filiados = Filiado.query.filter_by(regiao=regiao).all()
+    # Como não temos autenticação, usamos valores padrão
+    regiao = "Todas"
+    total_filiados = Filiado.query.count()
+    total_apoiadores = Filiado.query.filter_by(apoiador=True).count()
+    filiados = Filiado.query.all()
     
     return render_template('filiados.html', 
                           filiados=filiados,
@@ -220,20 +198,11 @@ def eventos():
     eventos = Evento.query.order_by(Evento.data_inicio).all()
     return render_template('eventos.html', eventos=eventos)
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
-
-        
 # API Endpoints
 @app.route('/api/filiados', methods=['GET'])
 def api_filiados():
-    regiao = session.get('regiao', 'Todas')
-    if regiao == 'Todas' or session.get('role') == 'admin':
-        filiados = Filiado.query.all()
-    else:
-        filiados = Filiado.query.filter_by(regiao=regiao).all()
+    # Sem autenticação - retorna todos os filiados
+    filiados = Filiado.query.all()
     
     return jsonify([{
         'id': f.id,
@@ -261,17 +230,10 @@ def api_eventos():
 
 @app.route('/api/kpi', methods=['GET'])
 def api_kpi():
-    regiao = session.get('regiao', 'Todas')
-    
-    # Filiados
-    if regiao == 'Todas' or session.get('role') == 'admin':
-        total_filiados = Filiado.query.count()
-        total_apoiadores = Filiado.query.filter_by(apoiador=True).count()
-        total_contatados = Filiado.query.filter_by(contatado=True).count()
-    else:
-        total_filiados = Filiado.query.filter_by(regiao=regiao).count()
-        total_apoiadores = Filiado.query.filter_by(regiao=regiao, apoiador=True).count()
-        total_contatados = Filiado.query.filter_by(regiao=regiao, contatado=True).count()
+    # Sem autenticação - usa valores padrão
+    total_filiados = Filiado.query.count()
+    total_apoiadores = Filiado.query.filter_by(apoiador=True).count()
+    total_contatados = Filiado.query.filter_by(contatado=True).count()
     
     # Metas
     metas = Meta.query.filter_by(concluida=False).all()
@@ -300,31 +262,19 @@ def api_kpi():
 # Rotas administrativas
 @app.route('/admin')
 def admin():
-    if session.get('role') != 'admin':
-        return redirect(url_for('dashboard'))
-    
-    users = User.query.all()
+    # Sem verificação de permissão
+    # users = User.query.all()  # Removido pois não temos mais modelo User
     regioes = db.session.query(Filiado.regiao).distinct().all()
     regioes = [r[0] for r in regioes if r[0]]
     
-    return render_template('admin.html', users=users, regioes=regioes)
+    return render_template('admin.html', users=[], regioes=regioes)
 
 def init_db():
+    # Cria apenas as tabelas necessárias
     db.create_all()
-    if not User.query.filter_by(username='admin').first():
-        admin_user = User(
-            username='admin',
-            password=generate_password_hash('admin123'),
-            role='admin',
-            regiao='Todas'
-        )
-        db.session.add(admin_user)
-        db.session.commit()
-        print("Usuário admin criado com sucesso!")  # Adicione esta linha
-    else:
-        print("Usuário admin já existe")  # Adicione esta linha
+    print("Banco de dados inicializado!")
 
 if __name__ == '__main__':
-    init_db()  # Chama a função de inicialização corrigida
-    port = int(os.environ.get('PORT', 5000))  # Adicione esta linha
+    init_db()
+    port = int(os.environ.get('PORT', 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
