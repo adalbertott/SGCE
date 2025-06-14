@@ -31,26 +31,45 @@
         </form>
     </div>
 
+    <!-- Bibliotecas -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
+    <!-- Script de Login -->
     <script>
-function realizarLogin() {
-    const username = $('#username').val();
-    const password = $('#password').val();
-    
-    $.post('/login', {
-        username: username,
-        password: password
-    }, function(response) {
-        if (response.success) {
-            window.location.href = '/';  // Redirect on success
-        } else {
-            $('#login-error').text(response.message).show();
+        $(document).ready(function() {
+            // Adiciona o event listener no envio do formulário
+            $('#login-form').submit(function(e) {
+                e.preventDefault(); // Impede o envio tradicional
+                realizarLogin();   // Chama a função de login
+            });
+        });
+
+        function realizarLogin() {
+            const username = $('#username').val();
+            const password = $('#password').val();
+            
+            $.post('/login', {
+                username: username,
+                password: password
+            }, function(response) {
+                if (response.success) {
+                    window.location.href = '/';  // Redireciona se sucesso
+                } else {
+                    $('#login-error').text(response.message).show();
+                }
+            }).fail(function() {
+                $('#login-error').text('Erro de conexão').show();
+            });
         }
-    }).fail(function() {
-        $('#login-error').text('Erro de conexão').show();
+$(document).ready(function() {
+    // Adiciona o event listener para o formulário
+    $('#login-form').on('submit', function(e) {
+        e.preventDefault();
+        realizarLogin();
     });
-}
+});
+</script>
     </script>
 </body>
 </html>

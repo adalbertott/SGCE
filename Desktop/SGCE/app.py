@@ -332,7 +332,6 @@ def admin():
 
 def init_db():
     db.create_all()
-    # Garantir que o usuário admin existe
     if not User.query.filter_by(username='admin').first():
         admin_user = User(
             username='admin',
@@ -342,7 +341,10 @@ def init_db():
         )
         db.session.add(admin_user)
         db.session.commit()
-
+        print("Usuário admin criado com sucesso!")  # Adicione esta linha
+    else:
+        print("Usuário admin já existe")  # Adicione esta linha
+        
 if __name__ == '__main__':
     init_db()  # Chama a função de inicialização corrigida
     port = int(os.environ.get('PORT', 5000))  # Adicione esta linha
