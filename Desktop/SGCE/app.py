@@ -100,6 +100,11 @@ class Contato(db.Model):
     observacoes = db.Column(db.Text)
     responsavel = db.Column(db.String(100))
 
+# DEIXE APENAS ESTA
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -241,19 +246,6 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# Adicione esta função antes das rotas
-@app.before_first_request
-def create_tables():
-    db.create_all()
-    if not User.query.filter_by(username='admin').first():
-        admin_user = User(
-            username='admin',
-            password=generate_password_hash('admin123'),
-            role='admin',
-            regiao='Todas'
-        )
-        db.session.add(admin_user)
-        db.session.commit()
         
 # API Endpoints
 @app.route('/api/filiados', methods=['GET'])
@@ -338,23 +330,20 @@ def admin():
     
     return render_template('admin.html', users=users, regioes=regioes)
 
-# Inicialização do banco de dados
 def init_db():
-    with app.app_context():
-        db.create_all()
-        
-        # Criar usuário admin se não existir
-        if not User.query.filter_by(username='admin').first():
-            admin_user = User(
-                username='admin',
-                password=generate_password_hash('admin123'),
-                role='admin'
-            )
-            db.session.add(admin_user)
-            db.session.commit()
+    db.create_all()
+    # Garantir que o usuário admin existe
+    if not User.query.filter_by(username='admin').first():
+        admin_user = User(
+            username='admin',
+            password=generate_password_hash('admin123'),
+            role='admin',
+            regiao='Todas'
+        )
+        db.session.add(admin_user)
+        db.session.commit()
 
-# Add this before app.run
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+    init_db()  # Chama a função de inicialização corrigida
+    port = int(os.environ.get('PORT', 5000))  # Adicione esta linha
     app.run(host="0.0.0.0", port=port, debug=True)
