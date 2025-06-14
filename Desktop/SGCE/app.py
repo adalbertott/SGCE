@@ -100,19 +100,6 @@ class Contato(db.Model):
     observacoes = db.Column(db.Text)
     responsavel = db.Column(db.String(100))
 
-# Adicione esta função antes das rotas
-@app.before_first_request
-def create_tables():
-    db.create_all()
-    if not User.query.filter_by(username='admin').first():
-        admin_user = User(
-            username='admin',
-            password=generate_password_hash('admin123'),
-            role='admin',
-            regiao='Todas'
-        )
-        db.session.add(admin_user)
-        db.session.commit()
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
